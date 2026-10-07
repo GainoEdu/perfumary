@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1 class="page-title">Carrinho</h1>
+{% if items %}
+<div class="cart-layout">
+  <div class="cart-lines">
+    {% for it in items %}{% set p = it.product %}
+    <div class="cart-line">
+      <a href="{{ url_for('shop.product', slug=p.slug) }}"><img src="{% if p.main_image %}{{ url_for('shop.media', media_id=p.main_image.media_id) }}{% else %}{{ url_for('static', filename='img/placeholder.svg') }}{% endif %}" alt=""></a>
+      <div class="grow"><a href="{{ url_for('shop.product', slug=p.slug) }}"><strong>{{ p.name }}</strong></a><p class="muted">{{ p.volume or '' }} · {{ p.current_price|brl }} cada</p></div>
+      <form method="post" action="{{ url_for('cart.update_qty', product_id=p.id) }}" class="inline-form">{{ m.csrf() }}
+        <input type="number" name="qty" value="{{ it.qty }}" min="0" max="{{ [p.stock, 20]|min }}" aria-label="Quantidade"><button class="btn btn-small" type="submit">Atualizar</button></form>
+      <strong>{{ it.line_total|brl }}</strong>
+      <form method="post" action="{{ url_for('cart.remove', product_id=p.id) }}">{{ m.csrf() }}<button class="link-btn" type="submit">Remover</button></form>
+    </div>
+    {% endfor %}
+    <form method="post" action="{{ url_for('cart.clear') }}">{{ m.csrf() }}<button class="link-btn" type="submit">Limpar carrinho</button></form>
+  </div>
+  <aside class="summary">
+    <h3>Resumo</h3>
+    <p><span>Subtotal</span><span>{{ subtotal|brl }}</span></p>
+    <p><span>Frete</span><span>{% if shipping == 0 %}Grátis{% else %}{{ shipping|brl }}{% endif %}</span></p>
+    <p><span>Desconto</span><span>{{ discount|brl }}</span></p>
+    <p class="total"><span>Total</span><span>{{ total|brl }}</span></p>
+    <a class="btn btn-gold block-btn" href="{{ url_for('cart.checkout') }}">Finalizar compra</a>
+  </aside>
+</div>
+{% else %}<p class="empty">Seu carrinho está vazio. <a href="{{ url_for('shop.products') }}">Ver perfumes</a></p>{% endif %}
+{% endblock %}

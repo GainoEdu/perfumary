@@ -1,0 +1,15 @@
+{% extends 'admin/base.html' %}
+{% block content %}
+<form method="post" enctype="multipart/form-data" class="panel narrow">
+  {{ m.csrf() }}
+  {{ m.field('title', 'Título', data.get('title', ''), required=True, attrs='maxlength="160"') }}
+  {{ m.field('subtitle', 'Subtítulo', data.get('subtitle', ''), attrs='maxlength="300"') }}
+  {{ m.field('button_text', 'Texto do botão', data.get('button_text', ''), attrs='maxlength="60"') }}
+  {{ m.field('link', 'Link', data.get('link', ''), help='Ex.: /produtos?promo=1 ou https://…') }}
+  {{ m.field('position', 'Ordem', data.get('position', '0'), 'number', attrs='min="0"') }}
+  {% if b and b.media_id %}<img class="preview" src="{{ url_for('shop.media', media_id=b.media_id) }}" alt=""><br>{{ m.check('image__remove', 'Remover imagem atual', False) }}{% endif %}
+  <label class="field"><span>Imagem</span><input type="file" name="image" accept="image/png,image/jpeg,image/webp"></label>
+  {{ m.check('active', 'Ativo', data.get('active')) }}
+  <div class="actions"><button class="btn" type="submit">Salvar</button><a class="btn btn-outline" href="{{ url_for('admin.banners') }}">Voltar</a></div>
+</form>
+{% endblock %}

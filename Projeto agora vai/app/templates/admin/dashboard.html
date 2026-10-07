@@ -1,0 +1,28 @@
+{% extends 'admin/base.html' %}
+{% block content %}
+<div class="stats">
+  <div class="stat"><span>Faturamento</span><strong>{{ stats.revenue|brl }}</strong></div>
+  <div class="stat"><span>Pedidos</span><strong>{{ stats.orders }}</strong></div>
+  <div class="stat"><span>Aguardando pagamento</span><strong>{{ stats.pending }}</strong></div>
+  <div class="stat"><span>Produtos</span><strong>{{ stats.products }}</strong></div>
+  <div class="stat"><span>Clientes</span><strong>{{ stats.customers }}</strong></div>
+</div>
+<div class="cols-2">
+  <section class="panel"><h2>Pedidos recentes</h2>
+    {% if recent %}<table class="table"><tbody>{% for o in recent %}
+      <tr><td><a href="{{ url_for('admin.order_detail', oid=o.id) }}">{{ o.number }}</a></td><td>{{ o.customer_name }}</td><td>{{ o.status }}</td><td>{{ o.total|brl }}</td></tr>{% endfor %}</tbody></table>
+    {% else %}<p class="muted">Nenhum pedido ainda.</p>{% endif %}</section>
+  <section class="panel"><h2>Estoque baixo</h2>
+    {% if low %}<table class="table"><tbody>{% for p in low %}
+      <tr><td><a href="{{ url_for('admin.product_form', pid=p.id) }}">{{ p.name }}</a></td><td>{{ p.stock }} un.</td></tr>{% endfor %}</tbody></table>
+    {% else %}<p class="muted">Tudo certo com o estoque.</p>{% endif %}</section>
+</div>
+<section class="panel"><h2>Atalhos</h2>
+  <div class="actions">
+    <a class="btn" href="{{ url_for('admin.product_form') }}">Novo produto</a>
+    <a class="btn btn-outline" href="{{ url_for('admin.homepage') }}">Editar página inicial</a>
+    <a class="btn btn-outline" href="{{ url_for('admin.appearance') }}">Mudar cores e logo</a>
+    <a class="btn btn-outline" href="{{ url_for('admin.settings') }}">Dados da loja</a>
+  </div>
+</section>
+{% endblock %}

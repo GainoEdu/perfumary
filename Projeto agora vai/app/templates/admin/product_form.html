@@ -1,0 +1,59 @@
+{% extends 'admin/base.html' %}
+{% block content %}
+<form method="post" enctype="multipart/form-data" class="stack">
+  {{ m.csrf() }}
+  <section class="panel"><h2>Informações</h2><div class="cols">
+    {{ m.field('name', 'Nome', data.get('name', ''), required=True, attrs='maxlength="200"') }}
+    {{ m.select_obj('brand_id', 'Marca', brands, data.get('brand_id')) }}
+    {{ m.select_obj('category_id', 'Categoria', categories, data.get('category_id')) }}
+    {{ m.select_obj('family_id', 'Família olfativa', families, data.get('family_id')) }}
+    {{ m.field('sku', 'SKU', data.get('sku', ''), attrs='maxlength="60"') }}
+    {{ m.field('barcode', 'Código de barras', data.get('barcode', ''), attrs='maxlength="60"') }}
+    {{ m.field('manufacturer', 'Fabricante', data.get('manufacturer', '')) }}
+    {{ m.field('origin_country', 'País de origem', data.get('origin_country', '')) }}
+    {{ m.field('launch_year', 'Ano de lançamento', data.get('launch_year', ''), 'number', attrs='min="1700" max="2100"') }}
+    {{ m.field('volume', 'Volume', data.get('volume', ''), attrs='placeholder="Ex.: 100 ml" maxlength="40"', help='Qualquer valor: 30 ml, 50 ml, 100 ml, 1 L…') }}
+  </div>
+  {{ m.field('short_description', 'Descrição curta', data.get('short_description', ''), attrs='maxlength="300"') }}
+  {{ m.textarea('description', 'Descrição completa', data.get('description', ''), 6) }}</section>
+
+  <section class="panel"><h2>Preço e estoque</h2><div class="cols">
+    {{ m.field('price', 'Preço normal (R$)', data.get('price', ''), required=True, attrs='inputmode="decimal"') }}
+    {{ m.field('promo_price', 'Preço promocional (R$)', data.get('promo_price', ''), attrs='inputmode="decimal"') }}
+    {{ m.field('stock', 'Quantidade em estoque', data.get('stock', ''), 'number', True, 'min="0"') }}
+    {{ m.field('min_stock', 'Estoque mínimo', data.get('min_stock', ''), 'number', True, 'min="0"') }}
+  </div>
+  <div class="checks">{{ m.check('promo_active', 'Promoção ativa', data.get('promo_active')) }}{{ m.check('active', 'Produto ativo (visível na loja)', data.get('active')) }}
+  {{ m.check('featured', 'Produto em destaque', data.get('featured')) }}{{ m.check('bestseller', 'Mais vendido', data.get('bestseller')) }}</div></section>
+
+  <section class="panel"><h2>Perfil olfativo</h2><div class="cols">
+    {{ m.textarea('top_notes', 'Notas de saída', data.get('top_notes', '')) }}
+    {{ m.textarea('heart_notes', 'Notas de coração', data.get('heart_notes', '')) }}
+    {{ m.textarea('base_notes', 'Notas de fundo', data.get('base_notes', '')) }}
+    {{ m.field('longevity', 'Fixação', data.get('longevity', ''), attrs='placeholder="Ex.: Alta (8h)"') }}
+    {{ m.field('projection', 'Projeção', data.get('projection', ''), attrs='placeholder="Ex.: Moderada"') }}
+    {{ m.field('occasion', 'Ocasião', data.get('occasion', ''), attrs='placeholder="Ex.: Noite, Trabalho"') }}
+    {{ m.field('gender', 'Gênero', data.get('gender', ''), attrs='list="genders" maxlength="40"') }}
+    <datalist id="genders"><option>Feminino</option><option>Masculino</option><option>Unissex</option><option>Infantil</option></datalist>
+  </div></section>
+
+  <section class="panel"><h2>Adicionar imagens</h2>
+    <label class="field"><span>Selecione uma ou mais imagens (JPG, PNG ou WEBP, até 8 MB cada)</span><input type="file" name="images" accept="image/png,image/jpeg,image/webp" multiple></label>
+    <p class="muted">A primeira imagem enviada vira a principal. Depois você pode trocar a principal e reordenar abaixo.</p></section>
+  <div class="actions"><button class="btn" type="submit">Salvar produto</button><a class="btn btn-outline" href="{{ url_for('admin.products') }}">Voltar</a></div>
+</form>
+
+{% if p and p.images %}
+<section class="panel"><h2>Galeria</h2>
+  <div class="gallery-admin">{% for i in p.images %}
+    <figure class="{{ 'is-main' if i.is_main }}"><img src="{{ url_for('shop.media', media_id=i.media_id) }}" alt="">
+      <figcaption>{% if i.is_main %}<strong>Principal</strong>{% endif %}
+        <div class="row-actions">
+          {% for act, label in [('principal', 'Definir principal'), ('subir', '◀'), ('descer', '▶'), ('excluir', 'Excluir')] %}
+            {% if not (act == 'principal' and i.is_main) %}
+            <form method="post" action="{{ url_for('admin.image_action', iid=i.id, action=act) }}"{% if act == 'excluir' %} data-confirm="Excluir esta imagem?"{% endif %}>{{ m.csrf() }}<button class="link-btn{{ ' danger' if act == 'excluir' }}" type="submit">{{ label }}</button></form>
+            {% endif %}{% endfor %}
+        </div></figcaption></figure>{% endfor %}
+  </div></section>
+{% endif %}
+{% endblock %}
