@@ -1,0 +1,11 @@
+{% extends 'admin/base.html' %}
+{% block content %}
+<div class="toolbar"><p class="muted">Banners promocionais exibidos na página inicial (o banner principal fica em Página inicial).</p><a class="btn" href="{{ url_for('admin.banner_form') }}">+ Novo banner</a></div>
+<div class="table-wrap"><table class="table"><thead><tr><th></th><th>Título</th><th>Link</th><th>Ordem</th><th>Status</th><th></th></tr></thead><tbody>
+{% for b in items %}<tr><td>{% if b.media_id %}<img class="thumb-sm wide" src="{{ url_for('shop.media', media_id=b.media_id) }}" alt="">{% endif %}</td>
+  <td><strong>{{ b.title }}</strong><br><small class="muted">{{ b.subtitle or '' }}</small></td><td>{{ b.link or '—' }}</td><td>{{ b.position }}</td><td>{{ 'Ativo' if b.active else 'Inativo' }}</td>
+  <td class="row-actions"><a href="{{ url_for('admin.banner_form', bid=b.id) }}">Editar</a>
+    <form method="post" action="{{ url_for('admin.banner_delete', bid=b.id) }}" data-confirm="Excluir este banner?">{{ m.csrf() }}<button class="link-btn danger" type="submit">Excluir</button></form></td></tr>
+{% else %}<tr><td colspan="6" class="muted">Nenhum banner.</td></tr>{% endfor %}
+</tbody></table></div>
+{% endblock %}

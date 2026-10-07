@@ -1,0 +1,18 @@
+{% extends 'admin/base.html' %}
+{% block content %}
+<div class="toolbar">
+  <form method="get" class="search-form"><input type="search" name="q" value="{{ term }}" placeholder="Buscar por nome ou SKU">
+    {{ m.check('baixo', 'Somente estoque baixo', low) }}<button class="btn btn-outline" type="submit">Filtrar</button></form>
+</div>
+<div class="table-wrap"><table class="table"><thead><tr><th>Produto</th><th>SKU</th><th>Estoque</th><th>Mínimo</th><th></th></tr></thead><tbody>
+{% for p in pagination.items %}<tr class="{{ 'warn-row' if p.low_stock }}">
+  <td><a href="{{ url_for('admin.product_form', pid=p.id) }}">{{ p.name }}</a> <small class="muted">{{ p.volume or '' }}</small></td><td>{{ p.sku or '—' }}</td>
+  <td colspan="3"><form method="post" action="{{ url_for('admin.stock_update', pid=p.id) }}" class="inline-form">{{ m.csrf() }}
+    <input type="hidden" name="next" value="{{ request.full_path }}">
+    <input type="number" name="stock" value="{{ p.stock }}" min="0" aria-label="Estoque">
+    <input type="number" name="min_stock" value="{{ p.min_stock }}" min="0" aria-label="Mínimo">
+    <button class="btn btn-small" type="submit">Salvar</button></form></td>
+</tr>{% else %}<tr><td colspan="5" class="muted">Nenhum produto.</td></tr>{% endfor %}
+</tbody></table></div>
+{{ m.pagination(pagination) }}
+{% endblock %}

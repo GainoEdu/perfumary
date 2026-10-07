@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="auth-box">
+  <h1>Entrar</h1>
+  <form method="post">
+    {{ m.csrf() }}
+    {{ m.field('email', 'E-mail', '', 'email', True, 'autocomplete="email"') }}
+    {{ m.field('password', 'Senha', '', 'password', True, 'autocomplete="current-password"') }}
+    <button class="btn btn-gold block-btn" type="submit">Entrar</button>
+  </form>
+  <p class="muted">Ainda não tem conta? <a href="{{ url_for('auth.register', next=request.args.get('next')) }}">Cadastre-se</a></p>
+</section>
+{% endblock %}

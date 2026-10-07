@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="hero">
+  <div class="hero-text">
+    <h1>{{ s.hero_title }}</h1>
+    <p>{{ s.hero_subtitle }}</p>
+    {% if s.hero_button_text %}<a class="btn btn-gold" href="{{ s.hero_link|safe_link }}">{{ s.hero_button_text }}</a>{% endif %}
+  </div>
+  {% if s.hero_image %}<img class="hero-img" src="{{ url_for('shop.media', media_id=s.hero_image|int) }}" alt="">{% endif %}
+</section>
+
+{% if banners %}
+<section class="banners">
+  {% for b in banners %}
+  <a class="banner" href="{{ b.link or url_for('shop.products') }}">
+    {% if b.media_id %}<img src="{{ url_for('shop.media', media_id=b.media_id) }}" alt="" loading="lazy">{% endif %}
+    <div><h3>{{ b.title }}</h3>{% if b.subtitle %}<p>{{ b.subtitle }}</p>{% endif %}{% if b.button_text %}<span class="btn btn-light">{{ b.button_text }}</span>{% endif %}</div>
+  </a>
+  {% endfor %}
+</section>
+{% endif %}
+
+{% macro grid(heading, items, more=None) %}
+{% if items %}
+<section class="block">
+  <div class="block-head"><h2>{{ heading }}</h2>{% if more %}<a href="{{ more }}">Ver todos</a>{% endif %}</div>
+  <div class="grid">{% for p in items %}{{ m.product_card(p) }}{% endfor %}</div>
+</section>
+{% endif %}
+{% endmacro %}
+
+{{ grid(s.title_featured, featured) }}
+{{ grid(s.title_bestsellers, bestsellers) }}
+{{ grid(s.title_offers, offers, url_for('shop.products', promo=1)) }}
+{{ grid(s.title_new, new, url_for('shop.products')) }}
+
+{% if categories %}
+<section class="block"><div class="block-head"><h2>{{ s.title_categories }}</h2></div>
+  <div class="chips">{% for c in categories %}<a href="{{ url_for('shop.products', categoria=c.slug) }}">{{ c.name }}</a>{% endfor %}</div>
+</section>
+{% endif %}
+{% if brands %}
+<section class="block"><div class="block-head"><h2>{{ s.title_brands }}</h2></div>
+  <div class="brands">{% for b in brands %}
+    <a href="{{ url_for('shop.products', marca=b.slug) }}">{% if b.logo_media_id %}<img src="{{ url_for('shop.media', media_id=b.logo_media_id) }}" alt="{{ b.name }}" loading="lazy">{% else %}<span>{{ b.name }}</span>{% endif %}</a>
+  {% endfor %}</div>
+</section>
+{% endif %}
+{% endblock %}

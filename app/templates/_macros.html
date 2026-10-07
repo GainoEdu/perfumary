@@ -1,0 +1,53 @@
+{% macro csrf() %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endmacro %}
+
+{% macro flashes() %}
+{% with msgs = get_flashed_messages(with_categories=true) %}
+{% if msgs %}<div class="flashes">{% for cat, msg in msgs %}<div class="flash flash-{{ cat }}">{{ msg }}</div>{% endfor %}</div>{% endif %}
+{% endwith %}
+{% endmacro %}
+
+{% macro field(name, label, value='', type='text', required=False, attrs='', help='') %}
+<label class="field"><span>{{ label }}{% if required %} *{% endif %}</span>
+<input type="{{ type }}" name="{{ name }}" value="{{ value if value is not none else '' }}"{% if required %} required{% endif %} {{ attrs|safe }}>
+{% if help %}<small>{{ help }}</small>{% endif %}</label>
+{% endmacro %}
+
+{% macro textarea(name, label, value='', rows=3, help='') %}
+<label class="field"><span>{{ label }}</span><textarea name="{{ name }}" rows="{{ rows }}">{{ value if value is not none else '' }}</textarea>{% if help %}<small>{{ help }}</small>{% endif %}</label>
+{% endmacro %}
+
+{% macro select_obj(name, label, items, selected, blank='—') %}
+<label class="field"><span>{{ label }}</span><select name="{{ name }}"><option value="">{{ blank }}</option>
+{% for i in items %}<option value="{{ i.id }}"{% if selected|string == i.id|string %} selected{% endif %}>{{ i.name }}</option>{% endfor %}</select></label>
+{% endmacro %}
+
+{% macro check(name, label, checked) %}
+<label class="check"><input type="checkbox" name="{{ name }}" value="1"{% if checked %} checked{% endif %}> <span>{{ label }}</span></label>
+{% endmacro %}
+
+{% macro pagination(pg) %}
+{% if pg.pages > 1 %}
+<nav class="pagination" aria-label="Paginação">
+  {% if pg.has_prev %}<a href="{{ page_url(pg.prev_num) }}">&larr; Anterior</a>{% endif %}
+  <span>Página {{ pg.page }} de {{ pg.pages }}</span>
+  {% if pg.has_next %}<a href="{{ page_url(pg.next_num) }}">Próxima &rarr;</a>{% endif %}
+</nav>
+{% endif %}
+{% endmacro %}
+
+{% macro product_card(p) %}
+<article class="card">
+  <a class="card-img" href="{{ url_for('shop.product', slug=p.slug) }}">
+    {% if p.main_image %}<img src="{{ url_for('shop.media', media_id=p.main_image.media_id) }}" alt="{{ p.name }}" loading="lazy">
+    {% else %}<img src="{{ url_for('static', filename='img/placeholder.svg') }}" alt="" loading="lazy">{% endif %}
+    {% if p.on_promo %}<span class="badge">-{{ p.discount_percent }}%</span>{% endif %}
+    {% if p.stock <= 0 %}<span class="badge badge-dark">Esgotado</span>{% endif %}
+  </a>
+  <div class="card-body">
+    {% if p.brand %}<p class="card-brand">{{ p.brand.name }}</p>{% endif %}
+    <h3><a href="{{ url_for('shop.product', slug=p.slug) }}">{{ p.name }}</a></h3>
+    {% if p.volume %}<p class="muted">{{ p.volume }}</p>{% endif %}
+    <p class="price">{% if p.on_promo %}<s>{{ p.price|brl }}</s> {% endif %}<strong>{{ p.current_price|brl }}</strong></p>
+  </div>
+</article>
+{% endmacro %}

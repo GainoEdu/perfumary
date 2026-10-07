@@ -1,0 +1,20 @@
+{% extends 'admin/base.html' %}
+{% block content %}
+<div class="toolbar">
+  <form method="get" class="search-form"><input type="search" name="q" value="{{ term }}" placeholder="Buscar por nome ou SKU"><button class="btn btn-outline" type="submit">Buscar</button></form>
+  <a class="btn" href="{{ url_for('admin.product_form') }}">+ Novo produto</a>
+</div>
+<div class="table-wrap"><table class="table"><thead><tr><th></th><th>Produto</th><th>Marca</th><th>Preço</th><th>Estoque</th><th>Status</th><th></th></tr></thead><tbody>
+{% for p in pagination.items %}<tr>
+  <td>{% if p.main_image %}<img class="thumb-sm" src="{{ url_for('shop.media', media_id=p.main_image.media_id) }}" alt="">{% endif %}</td>
+  <td><a href="{{ url_for('admin.product_form', pid=p.id) }}"><strong>{{ p.name }}</strong></a><br><small class="muted">{{ p.sku or '' }} {{ p.volume or '' }}</small></td>
+  <td>{{ p.brand.name if p.brand else '—' }}</td>
+  <td>{% if p.on_promo %}<s>{{ p.price|brl }}</s><br>{% endif %}{{ p.current_price|brl }}</td>
+  <td class="{{ 'warn' if p.low_stock }}">{{ p.stock }}</td>
+  <td>{{ 'Ativo' if p.active else 'Inativo' }}</td>
+  <td class="row-actions"><a href="{{ url_for('admin.product_form', pid=p.id) }}">Editar</a>
+    <form method="post" action="{{ url_for('admin.product_delete', pid=p.id) }}" data-confirm="Excluir este produto e suas imagens?">{{ m.csrf() }}<button class="link-btn danger" type="submit">Excluir</button></form></td>
+</tr>{% else %}<tr><td colspan="7" class="muted">Nenhum produto cadastrado.</td></tr>{% endfor %}
+</tbody></table></div>
+{{ m.pagination(pagination) }}
+{% endblock %}

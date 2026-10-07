@@ -1,0 +1,23 @@
+{% extends 'admin/base.html' %}
+{% block content %}
+<form method="post" enctype="multipart/form-data" class="stack">
+  {{ m.csrf() }}
+  {% for heading, fields in sections %}
+  <section class="panel"><h2>{{ heading }}</h2><div class="cols">
+    {% for f in fields %}
+      {% if f.type == 'bool' %}{{ m.check(f.key, f.label, f.value == '1') }}
+      {% elif f.type == 'textarea' %}{{ m.textarea(f.key, f.label, f.value, 3, f.help) }}
+      {% elif f.type == 'color' %}{{ m.field(f.key, f.label, f.value, 'color', False, '', f.help) }}
+      {% elif f.type == 'image' %}
+        <div class="field"><span>{{ f.label }}</span>
+          {% if f.value %}<img class="preview" src="{{ url_for('shop.media', media_id=f.value|int) }}" alt=""><br>{{ m.check(f.key ~ '__remove', 'Remover atual', False) }}{% endif %}
+          <input type="file" name="{{ f.key }}" accept="image/png,image/jpeg,image/webp">{% if f.help %}<small>{{ f.help }}</small>{% endif %}</div>
+      {% else %}{{ m.field(f.key, f.label, f.value, f.type if f.type in ('email', 'url') else 'text', False, 'inputmode="decimal"' if f.type == 'money' else '', f.help) }}
+      {% endif %}
+    {% endfor %}
+  </div></section>
+  {% endfor %}
+  {% if group == 'homepage' %}<p class="muted">Banners promocionais e produtos em destaque são gerenciados em <a href="{{ url_for('admin.banners') }}">Banners</a> e <a href="{{ url_for('admin.products') }}">Produtos</a> (marque “em destaque”, “mais vendido” ou “promoção”).</p>{% endif %}
+  <div class="actions"><button class="btn" type="submit">Salvar alterações</button></div>
+</form>
+{% endblock %}

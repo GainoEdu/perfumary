@@ -1,0 +1,13 @@
+{% extends 'admin/base.html' %}
+{% block shell %}
+<main class="login-wrap">
+  <form method="post" class="login-card">
+    <h1>{{ s.store_name }}</h1><p class="muted">Painel administrativo</p>
+    {{ m.flashes() }}
+    {{ m.csrf() }}
+    {{ m.field('email', 'E-mail', '', 'email', True, 'autocomplete="username" autofocus') }}
+    {{ m.field('password', 'Senha', '', 'password', True, 'autocomplete="current-password"') }}
+    <button class="btn" type="submit">Entrar</button>
+  </form>
+</main>
+{% endblock %}
